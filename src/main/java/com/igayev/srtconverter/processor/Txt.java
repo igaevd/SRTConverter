@@ -1,38 +1,25 @@
+package com.igayev.srtconverter.processor;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.FilenameFilter;
 
-public class SrtToTxt {
+public class Txt {
 
-    public static void main(String[] args) {
-        File directory = new File("/Users/dmitry.igayev/Movies");
+    private static final String TIMESTAMP_REGEX = "^\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}$";
+    private static final String NUMBER_REGEX = "^\\d+$";
 
-        // Filter to get only .srt files
-        File[] srtFiles = directory.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".srt");
-            }
-        });
-
-        if (srtFiles == null) {
-            System.out.println("No .srt files found or an I/O error occurred.");
-            return;
-        }
-
-        for (File srtFile : srtFiles) {
-            String outputFileName = srtFile.getName().replaceFirst("[.][^.]+$", "") + ".txt";
-            File outputFile = new File(directory, outputFileName);
-
-            convertFile(srtFile, outputFile);
+    public static void saveAsTxt(String text, File outputFile) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+            writer.write(text);
         }
     }
 
-    private static void convertFile(File inputFile, File outputFile) {
+    public static String convertSrtFileToText(File inputFile) {
+
         StringBuilder outputText = new StringBuilder();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
@@ -43,32 +30,29 @@ public class SrtToTxt {
                 if (line.trim().isEmpty()) {
                     String convertedBlock = convertBlock(block.toString().trim());
                     if (!convertedBlock.isEmpty()) {
-                        outputText.append(convertedBlock).append("\n");
+                        outputText.append(convertedBlock).append(System.lineSeparator());
+                        outputText.append(System.lineSeparator()); // Extra empty line between blocks
                     }
                     block.setLength(0);
                 } else {
-                    block.append(line).append("\n");
+                    block.append(line).append(System.lineSeparator());
                 }
             }
 
-            // Handling the last block
             String convertedBlock = convertBlock(block.toString().trim());
             if (!convertedBlock.isEmpty()) {
-                outputText.append(convertedBlock).append("\n");
+                outputText.append(convertedBlock).append(System.lineSeparator());
             }
 
-            // Write the output to the new file
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-                writer.write(outputText.toString().trim());
-            }
+            return outputText.toString().trim();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     private static String convertBlock(String block) {
-        String[] lines = block.split("\n");
+        String[] lines = block.split(System.lineSeparator());
 
         StringBuilder text = new StringBuilder();
 
@@ -97,10 +81,12 @@ public class SrtToTxt {
     }
 
     private static boolean isTimestamp(String line) {
-        return line.matches("^\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}$");
+        return line.matches(TIMESTAMP_REGEX);
     }
 
     private static boolean isSequenceNumber(String line) {
-        return line.matches("^\\d+$");
+        return line.matches(NUMBER_REGEX);
     }
+
+
 }
