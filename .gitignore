@@ -1,9 +1,19 @@
+# Compiled Java class files
+*.class
+
+# Logs and databases
+*.log
+*.dat
+
+# Build system files
 target/
-!.mvn/wrapper/maven-wrapper.jar
+build/
+out/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### IntelliJ IDEA ###
+# IntelliJ IDEA specific files
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -12,7 +22,12 @@ target/
 *.iml
 *.ipr
 
-### Eclipse ###
+# Gradle/Maven build directories
+.gradle/
+.m2/
+*.tmpdir
+
+# Eclipse
 .apt_generated
 .classpath
 .factorypath
@@ -21,7 +36,7 @@ target/
 .springBeans
 .sts4-cache
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -31,8 +46,20 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# VS Code
 .vscode/
 
-### Mac OS ###
-.DS_Store
+# OS-specific files
+.DS_Store # macOS
+Thumbs.db  # Windows
+
+# Other common files to ignore
+*.bak
+*.swp
+*.swo
+
+# Ignore keys and secrets
+secrets.properties
+
+# Exception for Maven wrapper
+!.mvn/wrapper/maven-wrapper.jar
